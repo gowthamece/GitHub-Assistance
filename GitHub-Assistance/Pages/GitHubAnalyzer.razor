@@ -45,7 +45,8 @@
             <ul>
                 @foreach (var suggestion in Result.Suggestions)
                 {
-                    <li>@suggestion</li>
+                    @* <li>@suggestion</li> *@
+                    <li>@((MarkupString)Markdig.Markdown.ToHtml(suggestion))</li>
                 }
             </ul>
         </div>

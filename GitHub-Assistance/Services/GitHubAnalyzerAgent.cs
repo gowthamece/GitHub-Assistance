@@ -16,12 +16,14 @@ public class GitHubAnalyzerAgent
     private readonly GitHubClient _githubClient;
     private readonly Kernel _kernel;
     private static readonly HttpClient client = new HttpClient();
-    public GitHubAnalyzerAgent()
+    private readonly IConfiguration _configuration;
+    public GitHubAnalyzerAgent(IConfiguration configuration)
     {
+        _configuration = configuration;
         _githubClient = new GitHubClient(new ProductHeaderValue("GitHubAnalyzerAgent"));
-        var modelId = "<Model>";
-        var endpoint = "<AI Model Endpoint>";
-        var apiKey = "<AI deployment API Key>";   
+        var modelId = configuration["AzureAI:modelId"];
+        var endpoint = configuration["AzureAI:endpoint"];
+        var apiKey = configuration["AzureAI:apiKey"];
         var builder = Kernel.CreateBuilder().AddAzureOpenAIChatCompletion(modelId, endpoint, apiKey);
         _kernel = builder.Build();
     }
@@ -34,8 +36,8 @@ public class GitHubAnalyzerAgent
 
             var repo = await _githubClient.Repository.Get(owner, name);
             var localPath = CloneRepository(repo.CloneUrl);
-            var suggestions = new List<string>();
-            //  var suggestions = await AnalyzeCodeQuality(localPath);
+          //  var suggestions = new List<string>();
+            var suggestions = await AnalyzeCodeQuality(localPath);
             var secretScan = await ScanForSecret(owner, name);
               var vulnerabilities = await ScanForVulnerabilities(owner, name);
          //   var vulnerabilities = new List<string>();
@@ -124,7 +126,7 @@ public class GitHubAnalyzerAgent
     private async Task<List<string>> ScanForVulnerabilities(string owner, string repoName)
     {
         var vulnerabilities = new List<string>();
-        var token = "<Github PAT token>";
+        var token = _configuration["GitHubConnections:PAToken"];
 
         if (string.IsNullOrEmpty(token))
         {
@@ -175,7 +177,7 @@ public class GitHubAnalyzerAgent
     private async Task<List<string>> ScanForSecret(string owner, string repoName)
     {
         var vulnerabilities = new List<string>();
-        var token = "<Github PAT token>";
+        var token = _configuration["GitHubConnections:PAToken"];
 
         if (string.IsNullOrEmpty(token))
         {

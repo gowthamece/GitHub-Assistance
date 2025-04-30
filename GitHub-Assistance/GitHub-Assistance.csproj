@@ -5,9 +5,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>GitHub_Assistance</RootNamespace>
+    <UserSecretsId>e8b27d1d-c3d1-4fcd-8cf9-5a775a8677b9</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Markdig" Version="0.41.1" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.47.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
   </ItemGroup>
