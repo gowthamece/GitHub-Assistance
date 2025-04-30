@@ -1,0 +1,84 @@
+﻿@page "/GitHubAnalyzer"
+@using GitHub_Assistance.Models
+@using GitHub_Assistance.Services
+@inject GitHubAnalyzerAgent Analyzer
+
+<h3>GitHub Repository Analyzer</h3>
+
+<div class="mb-3">
+    <input type="text" @bind="RepoUrl" placeholder="Enter GitHub Repository URL" class="form-control" />
+</div>
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="AnalyzeRepo" disabled="@IsAnalyzing">Analyze</button>
+</div>
+
+@if (IsAnalyzing)
+{
+    <p><em>Analyzing repository, please wait...</em></p>
+}
+
+@if (Result != null)
+{
+    <h4>Analysis Report</h4>
+
+    <ul class="nav nav-tabs" id="analysisTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="suggestions-tab" data-bs-toggle="tab" data-bs-target="#suggestions" type="button" role="tab" aria-controls="suggestions" aria-selected="true">
+                Suggestions
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="vulnerabilities-tab" data-bs-toggle="tab" data-bs-target="#vulnerabilities" type="button" role="tab" aria-controls="vulnerabilities" aria-selected="false">
+                Vulnerabilities
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="outdated-libraries-tab" data-bs-toggle="tab" data-bs-target="#outdated-libraries" type="button" role="tab" aria-controls="outdated-libraries" aria-selected="false">
+                Outdated Libraries
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="analysisTabsContent">
+        <div class="tab-pane fade show active" id="suggestions" role="tabpanel" aria-labelledby="suggestions-tab">
+            <h5>Suggestions</h5>
+            <ul>
+                @foreach (var suggestion in Result.Suggestions)
+                {
+                    <li>@suggestion</li>
+                }
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="vulnerabilities" role="tabpanel" aria-labelledby="vulnerabilities-tab">
+            <h5>Vulnerabilities</h5>
+            <ul>
+                @foreach (var vuln in Result.Vulnerabilities)
+                {
+                    <li>@vuln</li>
+                }
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="outdated-libraries" role="tabpanel" aria-labelledby="outdated-libraries-tab">
+            <h5>Outdated Libraries</h5>
+            <ul>
+                @foreach (var outdated in Result.OutdatedLibraries)
+                {
+                    <li>@outdated</li>
+                }
+            </ul>
+        </div>
+    </div>
+}
+
+@code {
+    private string RepoUrl;
+    private AnalysisResult? Result;
+    private bool IsAnalyzing = false;
+
+    private async Task AnalyzeRepo()
+    {
+        IsAnalyzing = true;
+        Result = await Analyzer.AnalyzeRepository(RepoUrl);
+        IsAnalyzing = false;
+    }
+}
