@@ -21,9 +21,10 @@ public class GitHubAnalyzerAgent
     {
         _configuration = configuration;
         _githubClient = new GitHubClient(new ProductHeaderValue("GitHubAnalyzerAgent"));
-        var modelId = configuration["AzureAI:modelId"];
-        var endpoint = configuration["AzureAI:endpoint"];
-        var apiKey = configuration["AzureAI:apiKey"];
+        
+        var modelId = configuration["AzureAI:modelId"]?? configuration["modelId"];
+        var endpoint = configuration["AzureAI:endpoint"]?? configuration["endpoint"];
+        var apiKey = configuration["AzureAI:apiKey"] ?? configuration["apiKey"];
         var builder = Kernel.CreateBuilder().AddAzureOpenAIChatCompletion(modelId, endpoint, apiKey);
         _kernel = builder.Build();
     }
